@@ -25,13 +25,12 @@ source-repository head
 
 library
   exposed-modules:
-      Abs
-      ErrM
-      Lex
-      Lib
-      Par
-      Print
-      Skel
+      Parser.Abs
+      Parser.ErrM
+      Parser.Lex
+      Parser.Par
+      Parser.Print
+      Parser.Skel
   other-modules:
       Paths_xd_lang
   hs-source-dirs:

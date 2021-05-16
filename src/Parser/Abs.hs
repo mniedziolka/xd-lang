@@ -7,9 +7,9 @@
 {-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE PatternSynonyms #-}
 
--- | The abstract syntax of language XD.
+-- | The abstract syntax of language Parser.
 
-module Abs where
+module Parser.Abs where
 
 import Prelude (Integer, String)
 import qualified Prelude as C
