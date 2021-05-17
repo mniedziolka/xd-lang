@@ -25,12 +25,16 @@ source-repository head
 
 library
   exposed-modules:
+      Interpreter.Evaluation
+      Interpreter.Program
+      Interpreter.Types
       Parser.Abs
       Parser.ErrM
       Parser.Lex
       Parser.Par
       Parser.Print
       Parser.Skel
+      TypeChecker.TypeCheck
   other-modules:
       Paths_xd_lang
   hs-source-dirs:
