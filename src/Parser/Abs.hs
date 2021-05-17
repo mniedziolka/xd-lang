@@ -43,8 +43,8 @@ data Stmt' a
     | Ass a Ident (Expr' a)
     | Incr a Ident
     | Decr a Ident
-    | Ret a (Expr' a)
-    | VRet a
+    | VRet a (Expr' a)
+    | Ret a
     | Cond a (Expr' a) (Stmt' a)
     | CondElse a (Expr' a) (Stmt' a) (Stmt' a)
     | While a (Expr' a) (Stmt' a)
@@ -153,8 +153,8 @@ instance HasPosition Stmt where
     Ass p _ _ -> p
     Incr p _ -> p
     Decr p _ -> p
-    Ret p _ -> p
-    VRet p -> p
+    VRet p _ -> p
+    Ret p -> p
     Cond p _ _ -> p
     CondElse p _ _ _ -> p
     While p _ _ -> p

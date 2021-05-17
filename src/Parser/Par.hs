@@ -560,7 +560,7 @@ happyReduction_22 happy_x_3
 	 =  case happyOutTok happy_x_1 of { happy_var_1 -> 
 	case happyOut29 happy_x_2 of { (HappyWrap29 happy_var_2) -> 
 	happyIn14
-		 ((uncurry Parser.Abs.BNFC'Position (tokenLineCol happy_var_1), Parser.Abs.Ret (uncurry Parser.Abs.BNFC'Position (tokenLineCol happy_var_1)) (snd happy_var_2))
+		 ((uncurry Parser.Abs.BNFC'Position (tokenLineCol happy_var_1), Parser.Abs.VRet (uncurry Parser.Abs.BNFC'Position (tokenLineCol happy_var_1)) (snd happy_var_2))
 	)}}
 
 happyReduce_23 = happySpecReduce_2  10# happyReduction_23
@@ -568,7 +568,7 @@ happyReduction_23 happy_x_2
 	happy_x_1
 	 =  case happyOutTok happy_x_1 of { happy_var_1 -> 
 	happyIn14
-		 ((uncurry Parser.Abs.BNFC'Position (tokenLineCol happy_var_1), Parser.Abs.VRet (uncurry Parser.Abs.BNFC'Position (tokenLineCol happy_var_1)))
+		 ((uncurry Parser.Abs.BNFC'Position (tokenLineCol happy_var_1), Parser.Abs.Ret (uncurry Parser.Abs.BNFC'Position (tokenLineCol happy_var_1)))
 	)}
 
 happyReduce_24 = happyReduce 5# 10# happyReduction_24

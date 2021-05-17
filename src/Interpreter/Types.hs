@@ -15,10 +15,10 @@ data Value = VInt Integer
            | VNull
   deriving (Eq, Ord)
 
-data StmtEnding = Break
-                 | Continue
-                 | Return
-                 | ReturnWithValue Value
+data StmtEnding = LoopBreak
+                | LoopContinue
+                | Return
+                | ReturnWithValue Value
 
 type Loc = Int
 type Env = Map.Map Ident Loc

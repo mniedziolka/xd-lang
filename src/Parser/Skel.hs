@@ -42,8 +42,8 @@ transStmt x = case x of
   Parser.Abs.Ass _ ident expr -> failure x
   Parser.Abs.Incr _ ident -> failure x
   Parser.Abs.Decr _ ident -> failure x
-  Parser.Abs.Ret _ expr -> failure x
-  Parser.Abs.VRet _ -> failure x
+  Parser.Abs.VRet _ expr -> failure x
+  Parser.Abs.Ret _ -> failure x
   Parser.Abs.Cond _ expr stmt -> failure x
   Parser.Abs.CondElse _ expr stmt1 stmt2 -> failure x
   Parser.Abs.While _ expr stmt -> failure x

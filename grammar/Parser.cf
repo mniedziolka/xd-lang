@@ -39,9 +39,9 @@ Incr.             Stmt ::= Ident "++"  ";" ;
 
 Decr.             Stmt ::= Ident "--"  ";" ;
 
-Ret.              Stmt ::= "yeet" Expr ";" ;
+VRet.              Stmt ::= "yeet" Expr ";" ;
 
-VRet.             Stmt ::= "yeet" ";" ;
+Ret.             Stmt ::= "yeet" ";" ;
 
 Cond.             Stmt ::= "if" "(" Expr ")" Stmt  ;
 

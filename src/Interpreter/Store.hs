@@ -45,3 +45,10 @@ alloc varType ident = do
     put (Map.insert loc VNull store)
     env <- ask
     return (Map.insert ident loc env)
+
+assignFunctionArgs :: [Arg] -> [Value] -> InterpreterMonad Env
+assignFunctionArgs [] [] = ask
+assignFunctionArgs ((VArg _ t id):args) (v:vs) = do
+    env <- alloc t id
+    local (const env) $ assignValue id v
+    local (const env) $ assignFunctionArgs args vs
