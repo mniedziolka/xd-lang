@@ -12,16 +12,10 @@ import Interpreter.Types
 import Parser.Abs
 
 
-topDefinition :: TopDef -> InterpreterMonad Env
-topDefinition (FnDef position retType ident args block) = do
-  env <- alloc retType ident
-  local (const env) (assignValue ident (VFun env retType args block))
-  return env
-
-topDefinitions :: [TopDef] -> InterpreterMonad Env
+topDefinitions :: [Stmt] -> InterpreterMonad Env
 topDefinitions [] = ask
 topDefinitions (head:tail) = do
-  env <- topDefinition head
+  (ending, env) <- evalStmt head
   local (const env) (topDefinitions tail)
 
 

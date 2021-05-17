@@ -20,15 +20,7 @@ import qualified Prelude as C
 import qualified Data.String
 
 type Program = Program' BNFC'Position
-data Program' a = Program a [TopDef' a]
-  deriving (C.Eq, C.Ord, C.Show, C.Read, C.Functor, C.Foldable, C.Traversable)
-
-type TopDef = TopDef' BNFC'Position
-data TopDef' a = FnDef a (Type' a) Ident [Arg' a] (Block' a)
-  deriving (C.Eq, C.Ord, C.Show, C.Read, C.Functor, C.Foldable, C.Traversable)
-
-type Arg = Arg' BNFC'Position
-data Arg' a = VArg a (Type' a) Ident | RArg a (Type' a) Ident
+data Program' a = Program a [Stmt' a]
   deriving (C.Eq, C.Ord, C.Show, C.Read, C.Functor, C.Foldable, C.Traversable)
 
 type Block = Block' BNFC'Position
@@ -39,7 +31,7 @@ type Stmt = Stmt' BNFC'Position
 data Stmt' a
     = Empty a
     | BStmt a (Block' a)
-    | Decl a (Type' a) [Item' a]
+    | VarDecl a (Type' a) [Item' a]
     | Ass a Ident (Expr' a)
     | Incr a Ident
     | Decr a Ident
@@ -54,6 +46,7 @@ data Stmt' a
     | ArrayAss a (Expr' a) (Expr' a) (Expr' a)
     | TupleUnpackExpr a [UnpackIdent' a] (Expr' a)
     | TupleUnpackIdent a [UnpackIdent' a] Ident
+    | FnDef a (Type' a) Ident [Arg' a] (Block' a)
   deriving (C.Eq, C.Ord, C.Show, C.Read, C.Functor, C.Foldable, C.Traversable)
 
 type Item = Item' BNFC'Position
@@ -62,6 +55,10 @@ data Item' a = NoInit a Ident | Init a Ident (Expr' a)
 
 type UnpackIdent = UnpackIdent' BNFC'Position
 data UnpackIdent' a = UnpackIdent a Ident
+  deriving (C.Eq, C.Ord, C.Show, C.Read, C.Functor, C.Foldable, C.Traversable)
+
+type Arg = Arg' BNFC'Position
+data Arg' a = VArg a (Type' a) Ident | RArg a (Type' a) Ident
   deriving (C.Eq, C.Ord, C.Show, C.Read, C.Functor, C.Foldable, C.Traversable)
 
 type Type = Type' BNFC'Position
@@ -132,15 +129,6 @@ instance HasPosition Program where
   hasPosition = \case
     Program p _ -> p
 
-instance HasPosition TopDef where
-  hasPosition = \case
-    FnDef p _ _ _ _ -> p
-
-instance HasPosition Arg where
-  hasPosition = \case
-    VArg p _ _ -> p
-    RArg p _ _ -> p
-
 instance HasPosition Block where
   hasPosition = \case
     Block p _ -> p
@@ -149,7 +137,7 @@ instance HasPosition Stmt where
   hasPosition = \case
     Empty p -> p
     BStmt p _ -> p
-    Decl p _ _ -> p
+    VarDecl p _ _ -> p
     Ass p _ _ -> p
     Incr p _ -> p
     Decr p _ -> p
@@ -164,6 +152,7 @@ instance HasPosition Stmt where
     ArrayAss p _ _ _ -> p
     TupleUnpackExpr p _ _ -> p
     TupleUnpackIdent p _ _ -> p
+    FnDef p _ _ _ _ -> p
 
 instance HasPosition Item where
   hasPosition = \case
@@ -173,6 +162,11 @@ instance HasPosition Item where
 instance HasPosition UnpackIdent where
   hasPosition = \case
     UnpackIdent p _ -> p
+
+instance HasPosition Arg where
+  hasPosition = \case
+    VArg p _ _ -> p
+    RArg p _ _ -> p
 
 instance HasPosition Type where
   hasPosition = \case

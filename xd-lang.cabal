@@ -27,6 +27,7 @@ library
   exposed-modules:
       Interpreter.Evaluation
       Interpreter.Program
+      Interpreter.Store
       Interpreter.Types
       Parser.Abs
       Parser.ErrM

@@ -22,7 +22,7 @@ evalExpr (EApp _ ident argsExpr) = do
   VFun env funType args block <- getIdentValue ident
   argsValues <- calculateArgsValues argsExpr
   envWithArgs <- local (const env) (assignFunctionArgs args argsValues)
-  retValue <- local (const envWithArgs) (evalBlock block)
+  (retValue, _) <- local (const envWithArgs) (evalBlock block)
   case retValue of
     Just (ReturnWithValue value) -> return value
     _ -> throwError "Function without yeeeeet"
@@ -36,29 +36,42 @@ evalExpr (ERel _ e1 op e2) = undefined
 evalExpr (EAnd _ e1 e2) = undefined
 evalExpr (EOr _ e1 e2) = undefined
 
-evalBlock :: Block -> InterpreterMonad (Maybe StmtEnding)
-evalBlock (Block _ []) = return Nothing
+evalBlock :: Block -> InterpreterMonad ((Maybe StmtEnding), Env)
+evalBlock (Block _ []) = do
+  env <- ask
+  return (Nothing, env)
 evalBlock (Block _ (head:tail)) = do
-  ending <- evalStmt head
+  (ending, env) <- evalStmt head
   case ending of
-    Nothing -> evalBlock (Block Nothing tail)
-    Just Return -> return $ Just Return
-    Just (ReturnWithValue value) -> return $ Just (ReturnWithValue value)
+    Nothing -> local (const env) $ evalBlock (Block Nothing tail)
+    Just Return -> return $ (Just Return, env)
+    Just (ReturnWithValue value) -> return $ (Just (ReturnWithValue value), env)
     _ -> throwError "Break and Continue not supported"
 
-evalStmt :: Stmt -> InterpreterMonad (Maybe StmtEnding)
+evalStmt :: Stmt -> InterpreterMonad ((Maybe StmtEnding), Env)
 evalStmt (Empty _) = undefined
 evalStmt (BStmt _ block) = evalBlock block
-evalStmt (Decl _ declType items) = undefined
-evalStmt (Ass _ ident expr) = undefined
+
+evalStmt (VarDecl _ declType items) = do
+
+
+evalStmt (Ass _ ident expr) = do
+  env <- ask
+  val <- evalExpr expr
+  assignValue ident val
+  return (Nothing, env)
+
 evalStmt (Incr _ ident) = undefined
 evalStmt (Decr _ ident) = undefined
 
-evalStmt (Ret _) = return $ Just Return
+evalStmt (Ret _) = do
+  env <- ask
+  return $ (Just Return, env)
 
 evalStmt (VRet _ expr) = do
+  env <- ask
   exprResult <- evalExpr expr
-  return $ Just $ ReturnWithValue exprResult
+  return $ (Just $ ReturnWithValue exprResult, env)
 
 evalStmt (Cond _ expr stmt) = undefined
 evalStmt (CondElse _ expr stmt1 stmt2) = undefined
@@ -67,5 +80,9 @@ evalStmt (Break _) = undefined
 evalStmt (ArrayAss _ _ _ _) = undefined
 evalStmt (TupleUnpackExpr _ targets expr) = undefined
 evalStmt (TupleUnpackIdent _ targets ident) = undefined
+evalStmt (FnDef _ retType ident args block) = do
+  env <- alloc retType ident
+  local (const env) (assignValue ident (VFun env retType args block))
+  return (Nothing, env)
 
 
