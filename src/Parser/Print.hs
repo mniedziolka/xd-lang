@@ -141,6 +141,7 @@ instance Print (Parser.Abs.Stmt' a) where
     Parser.Abs.TupleUnpackExpr _ unpackidents expr -> prPrec i 0 (concatD [doc (showString "<"), prt 0 unpackidents, doc (showString ">"), doc (showString "="), prt 0 expr, doc (showString ";")])
     Parser.Abs.TupleUnpackIdent _ unpackidents id_ -> prPrec i 0 (concatD [doc (showString "<"), prt 0 unpackidents, doc (showString ">"), doc (showString "="), prt 0 id_, doc (showString ";")])
     Parser.Abs.FnDef _ type_ id_ args block -> prPrec i 0 (concatD [prt 0 type_, prt 0 id_, doc (showString "("), prt 0 args, doc (showString ")"), prt 0 block])
+    Parser.Abs.Print _ expr -> prPrec i 0 (concatD [doc (showString "print"), doc (showString "("), prt 0 expr, doc (showString ")"), doc (showString ";")])
   prtList _ [] = concatD []
   prtList _ (x:xs) = concatD [prt 0 x, prt 0 xs]
 

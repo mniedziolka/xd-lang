@@ -1,0 +1,11 @@
+void proc(string str) {
+    print(str);
+    yeet;
+}
+
+int main() {
+    print("Before call");
+    proc("Hi, this is function");
+    print("After call");
+    yeet 0;
+}

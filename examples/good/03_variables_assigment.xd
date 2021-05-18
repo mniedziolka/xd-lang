@@ -1,0 +1,19 @@
+int initInt() {
+    yeet 5;
+}
+
+string initString() {
+    yeet "abcabc";
+}
+
+bool initBool() {
+    yeet true;
+}
+
+int main() {
+    int a, b = 3, c = initInt();
+    string s, ss = "abc", sss = initString();
+    bool t, tt = false, ttt = initBool();
+
+    yeet 0;
+}

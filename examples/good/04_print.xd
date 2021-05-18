@@ -1,0 +1,21 @@
+void fun () {
+    print("inside void");
+
+    void double_inside() {
+        print("double inside");
+        yeet;
+    }
+
+    double_inside();
+
+    yeet;
+}
+
+int main() {
+    string a = "a", b = "b", c = "c";
+    print(a);
+    print(b);
+    print("abc");
+    fun();
+    yeet 0;
+}

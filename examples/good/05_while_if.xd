@@ -1,0 +1,13 @@
+int main() {
+    int i = 3;
+    while (i > 0) {
+        print("LOOP");
+        i = i - 1;
+    }
+
+    if (i == 0) {
+        print("This is good");
+    }
+
+    yeet 0;
+}

@@ -45,6 +45,7 @@ transStmt x = case x of
   Parser.Abs.TupleUnpackExpr _ unpackidents expr -> failure x
   Parser.Abs.TupleUnpackIdent _ unpackidents ident -> failure x
   Parser.Abs.FnDef _ type_ ident args block -> failure x
+  Parser.Abs.Print _ expr -> failure x
 
 transItem :: Show a => Parser.Abs.Item' a -> Result
 transItem x = case x of

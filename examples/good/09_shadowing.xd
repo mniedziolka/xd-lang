@@ -1,0 +1,24 @@
+int main() {
+    int x = 0;
+    {
+        int x = 1;
+        void fun() {
+            if (x == 1) {
+                print("GOOD");
+            } else {
+                print("BAD");
+            }
+            yeet;
+        }
+
+        fun();
+    }
+
+    if (x == 0) {
+        print("GOOD");
+    } else {
+        print("BAD");
+    }
+
+    yeet 0;
+}

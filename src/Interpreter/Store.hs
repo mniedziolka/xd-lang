@@ -46,9 +46,15 @@ alloc varType ident = do
     env <- ask
     return (Map.insert ident loc env)
 
-assignFunctionArgs :: [Arg] -> [Value] -> InterpreterMonad Env
-assignFunctionArgs [] [] = ask
-assignFunctionArgs ((VArg _ t id):args) (v:vs) = do
-    env <- alloc t id
-    local (const env) $ assignValue id v
-    local (const env) $ assignFunctionArgs args vs
+assignFunctionArgs :: [Arg] -> [Value] -> [Maybe Loc] -> InterpreterMonad Env
+assignFunctionArgs [] [] [] = do
+  env <- ask
+  return env
+assignFunctionArgs ((VArg _ t ident):args) (v:vs) (l:ls) = do
+  env <- alloc t ident
+  local (const env) $ assignValue ident v
+  local (const env) $ assignFunctionArgs args vs ls
+assignFunctionArgs ((RArg _ t ident):args) (v:vs) ((Just loc):ls) = do
+  env <- alloc t ident
+  local (const $ Map.insert ident loc env) $ assignFunctionArgs args vs ls
+assignFunctionArgs _ _ _ = throwError "TYPECHECKER TODO"

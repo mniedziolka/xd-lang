@@ -2,18 +2,7 @@
 
 entrypoints Program ;
 
-Program.   Program ::= [TopDef] ;
-
-FnDef.	   TopDef ::= Type Ident "(" [Arg] ")" Block ;
-
-separator nonempty TopDef "" ;
-
-VArg. 	   Arg ::= Type Ident;
-
-RArg.      Arg ::= Type "&" Ident;
-
-separator  Arg "," ;
-
+Program.   Program ::= [Stmt] ;
 
 ------------------------- stmt -------------------------------
 
@@ -25,7 +14,7 @@ Empty.            Stmt ::= ";" ;
 
 BStmt.            Stmt ::= Block ;
 
-Decl.             Stmt ::= Type [Item] ";" ;
+VarDecl.          Stmt ::= Type [Item] ";" ;
 
 NoInit.           Item ::= Ident ;
 
@@ -39,9 +28,9 @@ Incr.             Stmt ::= Ident "++"  ";" ;
 
 Decr.             Stmt ::= Ident "--"  ";" ;
 
-VRet.              Stmt ::= "yeet" Expr ";" ;
+VRet.             Stmt ::= "yeet" Expr ";" ;
 
-Ret.             Stmt ::= "yeet" ";" ;
+Ret.              Stmt ::= "yeet" ";" ;
 
 Cond.             Stmt ::= "if" "(" Expr ")" Stmt  ;
 
@@ -64,6 +53,16 @@ TupleUnpackIdent. Stmt ::= "<" [UnpackIdent] ">" "=" Ident ";" ;
 UnpackIdent.      UnpackIdent ::= Ident ;
 
 separator UnpackIdent "," ;
+
+FnDef.	          Stmt ::= Type Ident "(" [Arg] ")" Block ;
+
+VArg. 	          Arg ::= Type Ident;
+
+RArg.             Arg ::= Type "&" Ident;
+
+separator         Arg "," ;
+
+Print.            Stmt ::= "print" "(" Expr ")" ";" ;
 
 
 ------------------------- types ------------------------------

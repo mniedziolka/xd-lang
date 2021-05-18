@@ -1,0 +1,14 @@
+int main() {
+    int a = 0;
+    string b = "abc";
+    bool c = true;
+
+    int aa = a + 5;
+    int aa_mod = aa % 5, aa_div = aa / 5, aa_mul = aa * 5;
+    XD string ++ operator
+    bool cc = !c;
+
+    bool neq_bool = c != cc;
+    bool eq_bool = c == cc;
+    yeet 0;
+}

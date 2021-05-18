@@ -1,0 +1,28 @@
+int funInt() {
+    int x = 1;
+    x = x + 2;
+    yeet x - 3;
+}
+
+string funString() {
+    string a = "abc";
+    yeet a;
+}
+
+bool funBool() {
+    yeet true;
+}
+
+int main() {
+    int a = funInt();
+    string b = funString();
+    bool c = funBool();
+
+    bool aa = a == 0, bb = b == "abc";
+
+    if (aa and bb and c) {
+        yeet 0;
+    } else {
+        yeet 1;
+    }
+}

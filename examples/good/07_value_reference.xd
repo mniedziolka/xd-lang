@@ -1,0 +1,21 @@
+void fun(int& x, int y) {
+    x = x + 5;
+    y = y + 5;
+    yeet;
+}
+
+int main() {
+    int x = 0, y = 0;
+    fun(x, y);
+    if (x == 0) {
+        print("x is not passed by reference");
+        yeet 1;
+    }
+
+    if (y != 0) {
+        print("y is not passed by value");
+        yeet 1;
+    }
+
+    yeet 0;
+}

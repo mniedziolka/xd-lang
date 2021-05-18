@@ -47,6 +47,7 @@ data Stmt' a
     | TupleUnpackExpr a [UnpackIdent' a] (Expr' a)
     | TupleUnpackIdent a [UnpackIdent' a] Ident
     | FnDef a (Type' a) Ident [Arg' a] (Block' a)
+    | Print a (Expr' a)
   deriving (C.Eq, C.Ord, C.Show, C.Read, C.Functor, C.Foldable, C.Traversable)
 
 type Item = Item' BNFC'Position
@@ -153,6 +154,7 @@ instance HasPosition Stmt where
     TupleUnpackExpr p _ _ -> p
     TupleUnpackIdent p _ _ -> p
     FnDef p _ _ _ _ -> p
+    Print p _ -> p
 
 instance HasPosition Item where
   hasPosition = \case
