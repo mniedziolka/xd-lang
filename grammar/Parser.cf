@@ -44,16 +44,6 @@ Break.            Stmt ::= "break" ";" ;
 
 Continue.         Stmt ::= "continue" ";" ;
 
-ArrayAss.         Stmt ::= Expr "[" Expr "]" "=" Expr ";" ;
-
-TupleUnpackExpr.  Stmt ::= "<" [UnpackIdent] ">" "=" Expr ";" ;
-
-TupleUnpackIdent. Stmt ::= "<" [UnpackIdent] ">" "=" Ident ";" ;
-
-UnpackIdent.      UnpackIdent ::= Ident ;
-
-separator UnpackIdent "," ;
-
 FnDef.	          Stmt ::= Type Ident "(" [Arg] ")" Block ;
 
 VArg. 	          Arg ::= Type Ident;
@@ -75,18 +65,12 @@ Bool.      Type ::= "bool" ;
 
 Void.      Type ::= "void" ;
 
-Array.     Type ::= Type "[" Integer "]" ;
-
-Tuple.     Type ::= "tuple" "<" [Type] ">" ;
-
 internal   Fun. Type ::= Type "(" [Type] ")" ;
 
 separator  Type "," ;
 
 
 ------------------------- expr -------------------------------
-
-EArrayVar. Expr6 ::= Expr "[" Expr "]" ;
 
 EVar.      Expr6 ::= Ident ;
 
@@ -99,12 +83,6 @@ ELitFalse. Expr6 ::= "false" ;
 EApp.      Expr6 ::= Ident "(" [Expr] ")" ;
 
 EString.   Expr6 ::= String ;
-
-ETuple.    Expr6 ::= "<|" [TItem] "|>" ;
-
-TItem.     TItem ::= Expr ;
-
-separator nonempty TItem "," ;
 
 Neg.       Expr5 ::= "-" Expr6 ;
 

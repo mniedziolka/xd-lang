@@ -15,8 +15,10 @@ import Parser.Abs
 topDefinitions :: [Stmt] -> InterpreterMonad Env
 topDefinitions [] = ask
 topDefinitions (head:tail) = do
-  (ending, env) <- evalStmt head
-  local (const env) (topDefinitions tail)
+  stmtRet <- evalStmt head
+  case stmtRet of
+    Just (VEnv env) ->  local (const env) (topDefinitions tail)
+    _ -> topDefinitions tail
 
 
 interpret :: Program -> InterpreterMonad Integer

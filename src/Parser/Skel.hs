@@ -41,9 +41,6 @@ transStmt x = case x of
   Parser.Abs.SExp _ expr -> failure x
   Parser.Abs.Break _ -> failure x
   Parser.Abs.Continue _ -> failure x
-  Parser.Abs.ArrayAss _ expr1 expr2 expr3 -> failure x
-  Parser.Abs.TupleUnpackExpr _ unpackidents expr -> failure x
-  Parser.Abs.TupleUnpackIdent _ unpackidents ident -> failure x
   Parser.Abs.FnDef _ type_ ident args block -> failure x
   Parser.Abs.Print _ expr -> failure x
 
@@ -51,10 +48,6 @@ transItem :: Show a => Parser.Abs.Item' a -> Result
 transItem x = case x of
   Parser.Abs.NoInit _ ident -> failure x
   Parser.Abs.Init _ ident expr -> failure x
-
-transUnpackIdent :: Show a => Parser.Abs.UnpackIdent' a -> Result
-transUnpackIdent x = case x of
-  Parser.Abs.UnpackIdent _ ident -> failure x
 
 transArg :: Show a => Parser.Abs.Arg' a -> Result
 transArg x = case x of
@@ -67,20 +60,16 @@ transType x = case x of
   Parser.Abs.Str _ -> failure x
   Parser.Abs.Bool _ -> failure x
   Parser.Abs.Void _ -> failure x
-  Parser.Abs.Array _ type_ integer -> failure x
-  Parser.Abs.Tuple _ types -> failure x
   Parser.Abs.Fun _ type_ types -> failure x
 
 transExpr :: Show a => Parser.Abs.Expr' a -> Result
 transExpr x = case x of
-  Parser.Abs.EArrayVar _ expr1 expr2 -> failure x
   Parser.Abs.EVar _ ident -> failure x
   Parser.Abs.ELitInt _ integer -> failure x
   Parser.Abs.ELitTrue _ -> failure x
   Parser.Abs.ELitFalse _ -> failure x
   Parser.Abs.EApp _ ident exprs -> failure x
   Parser.Abs.EString _ string -> failure x
-  Parser.Abs.ETuple _ titems -> failure x
   Parser.Abs.Neg _ expr -> failure x
   Parser.Abs.Not _ expr -> failure x
   Parser.Abs.EMul _ expr1 mulop expr2 -> failure x
@@ -88,10 +77,6 @@ transExpr x = case x of
   Parser.Abs.ERel _ expr1 relop expr2 -> failure x
   Parser.Abs.EAnd _ expr1 expr2 -> failure x
   Parser.Abs.EOr _ expr1 expr2 -> failure x
-
-transTItem :: Show a => Parser.Abs.TItem' a -> Result
-transTItem x = case x of
-  Parser.Abs.TItem _ expr -> failure x
 
 transAddOp :: Show a => Parser.Abs.AddOp' a -> Result
 transAddOp x = case x of

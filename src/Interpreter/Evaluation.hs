@@ -23,7 +23,6 @@ getLoc (_:tail) = do
 
 
 evalExpr :: Expr -> InterpreterMonad Value
-evalExpr (EArrayVar _ x y) = undefined
 evalExpr (EVar _ ident) = getIdentValue ident
 evalExpr (ELitInt _ val) = return $ VInt val
 evalExpr (ELitTrue _) = return $ VBool True
@@ -34,14 +33,13 @@ evalExpr (EApp _ ident argsExpr) = do
   argsValues <- calculateArgsValues argsExpr
   maybeLoc <- getLoc argsExpr
   envWithArgs <- local (const env) (assignFunctionArgs args argsValues maybeLoc)
-  (retValue, _) <- local (const envWithArgs) (evalBlock block)
+  retValue <- local (const envWithArgs) (evalBlock block)
   case retValue of
     Just (ReturnWithValue value) -> return value
     Just (Return) -> return VNull
     _ -> throwError "Function without yeeeeet"
 
 evalExpr (EString _ val) = return $ VString val
-evalExpr (ETuple _ items) = undefined
 evalExpr (Neg _ expr) = do
   VInt int <- evalExpr expr
   return $ VInt (- int)
@@ -106,100 +104,89 @@ evalExpr (EOr _ e1 e2) = do
   VBool b2 <- evalExpr e2
   return $ VBool $ b1 || b2
 
-evalBlock :: Block -> InterpreterMonad ((Maybe StmtEnding), Env)
+evalBlock :: Block -> InterpreterMonad (Maybe StmtEnding)
 evalBlock (Block _ []) = do
-  env <- ask
-  return (Nothing, env)
+  return Nothing
 evalBlock (Block _ (head:tail)) = do
-  (ending, env) <- evalStmt head
+  ending <- evalStmt head
   case ending of
-    Nothing -> local (const env) $ evalBlock (Block Nothing tail)
-    Just Return -> return $ (Just Return, env)
-    Just (ReturnWithValue value) -> return $ (Just (ReturnWithValue value), env)
-    Just LoopContinue -> return (Just LoopContinue, env)
-    Just LoopBreak -> return (Just LoopBreak, env)
+    Nothing -> evalBlock (Block Nothing tail)
+    Just Return -> return $ Just Return
+    Just (ReturnWithValue value) -> return $ Just $ ReturnWithValue value
+    Just LoopContinue -> return $ Just LoopContinue
+    Just LoopBreak -> return $ Just LoopBreak
+    Just (VEnv env) -> local (const env) (evalBlock (Block Nothing tail))
 
-evalStmt :: Stmt -> InterpreterMonad ((Maybe StmtEnding), Env)
+evalStmt :: Stmt -> InterpreterMonad (Maybe StmtEnding)
 evalStmt (Empty _) = undefined
 evalStmt (BStmt _ block) = do
-  env <- ask
-  (ending, _) <- evalBlock block
-  return (ending, env)
+  ending <- evalBlock block
+  return ending
 
 evalStmt (VarDecl _ t items) = do
   env <- putVarDecl t items
-  return (Nothing, env)
+  return $ Just $ VEnv env
 
 evalStmt (Ass _ ident expr) = do
   env <- ask
   val <- evalExpr expr
   assignValue ident val
-  return (Nothing, env)
+  return $ Just $ VEnv env
 
 evalStmt (Incr _ ident) = undefined
 evalStmt (Decr _ ident) = undefined
 
 evalStmt (Ret _) = do
-  env <- ask
-  return $ (Just Return, env)
+  return $ Just Return
 
 evalStmt (VRet _ expr) = do
-  env <- ask
   exprResult <- evalExpr expr
-  return $ (Just $ ReturnWithValue exprResult, env)
+  return $ Just $ ReturnWithValue exprResult
 
 evalStmt (Cond _ expr stmt) = do
-  env <- ask
   VBool val <- evalExpr expr
   if val then evalStmt stmt
-  else return (Nothing, env)
+  else return Nothing
 
 evalStmt (CondElse _ expr stmt1 stmt2) = do
-  env <- ask
   VBool val <- evalExpr expr
   if val then evalStmt stmt1
   else evalStmt stmt2
 
 evalStmt (While _ expr block) = do
-  env <- ask
   VBool b <- evalExpr expr
   if b then do
-    (ret, _) <- evalStmt block
+    ret <- evalStmt block
     case ret of
-      Just LoopBreak -> return (Nothing, env)
-      Just Return -> return $ (Just Return, env)
-      Just (ReturnWithValue v) -> return $ (Just $ ReturnWithValue v, env)
+      Just LoopBreak -> return Nothing
+      Just Return -> return $ Just Return
+      Just (ReturnWithValue v) -> return $ Just $ ReturnWithValue v
       _ -> evalStmt $ While Nothing expr block
   else
-    return (Nothing, env)
+    return Nothing
 
 evalStmt (SExp _ expr) = do
-  env <- ask
   val <- evalExpr expr
-  return $ (Nothing, env)
+  return Nothing
 
 evalStmt (Break _) = do
-  env <- ask
-  return (Just LoopBreak, env)
+  return $ Just LoopBreak
 
 evalStmt (Continue _) = do
-  env <- ask
-  return (Just LoopContinue, env)
-
-evalStmt (ArrayAss _ _ _ _) = undefined
-evalStmt (TupleUnpackExpr _ targets expr) = undefined
-evalStmt (TupleUnpackIdent _ targets ident) = undefined
+  return $ Just LoopContinue
 
 evalStmt (FnDef _ retType ident args block) = do
   env <- alloc retType ident
   local (const env) (assignValue ident (VFun env retType args block))
-  return (Nothing, env)
+  return $ Just $ VEnv env
 
 evalStmt (Print _ expr) = do
-  env <- ask
-  VString output <- evalExpr expr
-  liftIO $ print output
-  return (Nothing, env)
+  output <- evalExpr expr
+  case output of
+    VString s -> liftIO $ print s
+    VInt x -> liftIO $ print x
+    _ -> throwError "Unknown error"
+  return Nothing
 
 
 putVarDecl :: Type -> [Item] -> InterpreterMonad Env

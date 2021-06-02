@@ -137,9 +137,6 @@ instance Print (Parser.Abs.Stmt' a) where
     Parser.Abs.SExp _ expr -> prPrec i 0 (concatD [prt 0 expr, doc (showString ";")])
     Parser.Abs.Break _ -> prPrec i 0 (concatD [doc (showString "break"), doc (showString ";")])
     Parser.Abs.Continue _ -> prPrec i 0 (concatD [doc (showString "continue"), doc (showString ";")])
-    Parser.Abs.ArrayAss _ expr1 expr2 expr3 -> prPrec i 0 (concatD [prt 0 expr1, doc (showString "["), prt 0 expr2, doc (showString "]"), doc (showString "="), prt 0 expr3, doc (showString ";")])
-    Parser.Abs.TupleUnpackExpr _ unpackidents expr -> prPrec i 0 (concatD [doc (showString "<"), prt 0 unpackidents, doc (showString ">"), doc (showString "="), prt 0 expr, doc (showString ";")])
-    Parser.Abs.TupleUnpackIdent _ unpackidents id_ -> prPrec i 0 (concatD [doc (showString "<"), prt 0 unpackidents, doc (showString ">"), doc (showString "="), prt 0 id_, doc (showString ";")])
     Parser.Abs.FnDef _ type_ id_ args block -> prPrec i 0 (concatD [prt 0 type_, prt 0 id_, doc (showString "("), prt 0 args, doc (showString ")"), prt 0 block])
     Parser.Abs.Print _ expr -> prPrec i 0 (concatD [doc (showString "print"), doc (showString "("), prt 0 expr, doc (showString ")"), doc (showString ";")])
   prtList _ [] = concatD []
@@ -153,16 +150,6 @@ instance Print (Parser.Abs.Item' a) where
   prtList _ (x:xs) = concatD [prt 0 x, doc (showString ","), prt 0 xs]
 
 instance Print [Parser.Abs.Item' a] where
-  prt = prtList
-
-instance Print (Parser.Abs.UnpackIdent' a) where
-  prt i = \case
-    Parser.Abs.UnpackIdent _ id_ -> prPrec i 0 (concatD [prt 0 id_])
-  prtList _ [] = concatD []
-  prtList _ [x] = concatD [prt 0 x]
-  prtList _ (x:xs) = concatD [prt 0 x, doc (showString ","), prt 0 xs]
-
-instance Print [Parser.Abs.UnpackIdent' a] where
   prt = prtList
 
 instance Print (Parser.Abs.Arg' a) where
@@ -182,8 +169,6 @@ instance Print (Parser.Abs.Type' a) where
     Parser.Abs.Str _ -> prPrec i 0 (concatD [doc (showString "string")])
     Parser.Abs.Bool _ -> prPrec i 0 (concatD [doc (showString "bool")])
     Parser.Abs.Void _ -> prPrec i 0 (concatD [doc (showString "void")])
-    Parser.Abs.Array _ type_ n -> prPrec i 0 (concatD [prt 0 type_, doc (showString "["), prt 0 n, doc (showString "]")])
-    Parser.Abs.Tuple _ types -> prPrec i 0 (concatD [doc (showString "tuple"), doc (showString "<"), prt 0 types, doc (showString ">")])
     Parser.Abs.Fun _ type_ types -> prPrec i 0 (concatD [prt 0 type_, doc (showString "("), prt 0 types, doc (showString ")")])
   prtList _ [] = concatD []
   prtList _ [x] = concatD [prt 0 x]
@@ -194,14 +179,12 @@ instance Print [Parser.Abs.Type' a] where
 
 instance Print (Parser.Abs.Expr' a) where
   prt i = \case
-    Parser.Abs.EArrayVar _ expr1 expr2 -> prPrec i 6 (concatD [prt 0 expr1, doc (showString "["), prt 0 expr2, doc (showString "]")])
     Parser.Abs.EVar _ id_ -> prPrec i 6 (concatD [prt 0 id_])
     Parser.Abs.ELitInt _ n -> prPrec i 6 (concatD [prt 0 n])
     Parser.Abs.ELitTrue _ -> prPrec i 6 (concatD [doc (showString "true")])
     Parser.Abs.ELitFalse _ -> prPrec i 6 (concatD [doc (showString "false")])
     Parser.Abs.EApp _ id_ exprs -> prPrec i 6 (concatD [prt 0 id_, doc (showString "("), prt 0 exprs, doc (showString ")")])
     Parser.Abs.EString _ str -> prPrec i 6 (concatD [prt 0 str])
-    Parser.Abs.ETuple _ titems -> prPrec i 6 (concatD [doc (showString "<|"), prt 0 titems, doc (showString "|>")])
     Parser.Abs.Neg _ expr -> prPrec i 5 (concatD [doc (showString "-"), prt 6 expr])
     Parser.Abs.Not _ expr -> prPrec i 5 (concatD [doc (showString "!"), prt 6 expr])
     Parser.Abs.EMul _ expr1 mulop expr2 -> prPrec i 4 (concatD [prt 4 expr1, prt 0 mulop, prt 5 expr2])
@@ -212,15 +195,6 @@ instance Print (Parser.Abs.Expr' a) where
   prtList _ [] = concatD []
   prtList _ [x] = concatD [prt 0 x]
   prtList _ (x:xs) = concatD [prt 0 x, doc (showString ","), prt 0 xs]
-
-instance Print (Parser.Abs.TItem' a) where
-  prt i = \case
-    Parser.Abs.TItem _ expr -> prPrec i 0 (concatD [prt 0 expr])
-  prtList _ [x] = concatD [prt 0 x]
-  prtList _ (x:xs) = concatD [prt 0 x, doc (showString ","), prt 0 xs]
-
-instance Print [Parser.Abs.TItem' a] where
-  prt = prtList
 
 instance Print [Parser.Abs.Expr' a] where
   prt = prtList

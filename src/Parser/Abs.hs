@@ -43,9 +43,6 @@ data Stmt' a
     | SExp a (Expr' a)
     | Break a
     | Continue a
-    | ArrayAss a (Expr' a) (Expr' a) (Expr' a)
-    | TupleUnpackExpr a [UnpackIdent' a] (Expr' a)
-    | TupleUnpackIdent a [UnpackIdent' a] Ident
     | FnDef a (Type' a) Ident [Arg' a] (Block' a)
     | Print a (Expr' a)
   deriving (C.Eq, C.Ord, C.Show, C.Read, C.Functor, C.Foldable, C.Traversable)
@@ -54,35 +51,23 @@ type Item = Item' BNFC'Position
 data Item' a = NoInit a Ident | Init a Ident (Expr' a)
   deriving (C.Eq, C.Ord, C.Show, C.Read, C.Functor, C.Foldable, C.Traversable)
 
-type UnpackIdent = UnpackIdent' BNFC'Position
-data UnpackIdent' a = UnpackIdent a Ident
-  deriving (C.Eq, C.Ord, C.Show, C.Read, C.Functor, C.Foldable, C.Traversable)
-
 type Arg = Arg' BNFC'Position
 data Arg' a = VArg a (Type' a) Ident | RArg a (Type' a) Ident
   deriving (C.Eq, C.Ord, C.Show, C.Read, C.Functor, C.Foldable, C.Traversable)
 
 type Type = Type' BNFC'Position
 data Type' a
-    = Int a
-    | Str a
-    | Bool a
-    | Void a
-    | Array a (Type' a) Integer
-    | Tuple a [Type' a]
-    | Fun a (Type' a) [Type' a]
+    = Int a | Str a | Bool a | Void a | Fun a (Type' a) [Type' a]
   deriving (C.Eq, C.Ord, C.Show, C.Read, C.Functor, C.Foldable, C.Traversable)
 
 type Expr = Expr' BNFC'Position
 data Expr' a
-    = EArrayVar a (Expr' a) (Expr' a)
-    | EVar a Ident
+    = EVar a Ident
     | ELitInt a Integer
     | ELitTrue a
     | ELitFalse a
     | EApp a Ident [Expr' a]
     | EString a String
-    | ETuple a [TItem' a]
     | Neg a (Expr' a)
     | Not a (Expr' a)
     | EMul a (Expr' a) (MulOp' a) (Expr' a)
@@ -90,10 +75,6 @@ data Expr' a
     | ERel a (Expr' a) (RelOp' a) (Expr' a)
     | EAnd a (Expr' a) (Expr' a)
     | EOr a (Expr' a) (Expr' a)
-  deriving (C.Eq, C.Ord, C.Show, C.Read, C.Functor, C.Foldable, C.Traversable)
-
-type TItem = TItem' BNFC'Position
-data TItem' a = TItem a (Expr' a)
   deriving (C.Eq, C.Ord, C.Show, C.Read, C.Functor, C.Foldable, C.Traversable)
 
 type AddOp = AddOp' BNFC'Position
@@ -150,9 +131,6 @@ instance HasPosition Stmt where
     SExp p _ -> p
     Break p -> p
     Continue p -> p
-    ArrayAss p _ _ _ -> p
-    TupleUnpackExpr p _ _ -> p
-    TupleUnpackIdent p _ _ -> p
     FnDef p _ _ _ _ -> p
     Print p _ -> p
 
@@ -160,10 +138,6 @@ instance HasPosition Item where
   hasPosition = \case
     NoInit p _ -> p
     Init p _ _ -> p
-
-instance HasPosition UnpackIdent where
-  hasPosition = \case
-    UnpackIdent p _ -> p
 
 instance HasPosition Arg where
   hasPosition = \case
@@ -176,20 +150,16 @@ instance HasPosition Type where
     Str p -> p
     Bool p -> p
     Void p -> p
-    Array p _ _ -> p
-    Tuple p _ -> p
     Fun p _ _ -> p
 
 instance HasPosition Expr where
   hasPosition = \case
-    EArrayVar p _ _ -> p
     EVar p _ -> p
     ELitInt p _ -> p
     ELitTrue p -> p
     ELitFalse p -> p
     EApp p _ _ -> p
     EString p _ -> p
-    ETuple p _ -> p
     Neg p _ -> p
     Not p _ -> p
     EMul p _ _ _ -> p
@@ -197,10 +167,6 @@ instance HasPosition Expr where
     ERel p _ _ _ -> p
     EAnd p _ _ -> p
     EOr p _ _ -> p
-
-instance HasPosition TItem where
-  hasPosition = \case
-    TItem p _ -> p
 
 instance HasPosition AddOp where
   hasPosition = \case

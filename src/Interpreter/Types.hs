@@ -19,6 +19,7 @@ data StmtEnding = LoopBreak
                 | LoopContinue
                 | Return
                 | ReturnWithValue Value
+                | VEnv Env
 
 type Loc = Int
 type Env = Map.Map Ident Loc
