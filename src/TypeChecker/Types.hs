@@ -10,7 +10,7 @@ import Parser.Abs
 data TCType = TCInt
             | TCString
             | TCBool
-            | TCFun Env Type [Arg] Block
+            | TCFun Type [Arg]
             | TCVoid
   deriving (Eq, Ord)
 

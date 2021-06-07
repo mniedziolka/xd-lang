@@ -43,15 +43,13 @@ run v p s =
       putStrV v $ show ts
       putStrLn err
       exitFailure
-    Right tree ->
-      case runTypeCheck tree of
+    Right tree -> do
+      typeCheck <- runTypeCheck tree
+      case typeCheck of
         Left error -> do
-          putStrLn "\nParse Successful!"
-          putStrLn "Typecheck fail"
+          putStrLn $ show error
           exitFailure
         Right _ -> do
-          putStrLn "\nTypecheck Successful!"
---          showTree v tree
           (result, store) <- runInterpreter tree
           case result of
             Left error -> do

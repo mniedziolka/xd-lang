@@ -11,12 +11,26 @@ import Parser.Abs
 
 
 evalExpr :: Expr -> TypeCheckerMonad TCType
-evalExpr (EVar _ ident) = undefined
+evalExpr (EVar pos ident) = do
+  maybeTCType <- askForType ident
+  case maybeTCType of
+    Nothing -> throwError ("Error: Variable undefined in " ++ show pos)
+    Just tcType -> return tcType
 evalExpr (ELitInt _ val) = return TCInt
 evalExpr (ELitTrue _) = return TCBool
 evalExpr (ELitFalse _) = return TCBool
 
-evalExpr (EApp _ ident argsExpr) = undefined
+evalExpr (EApp pos ident argsExpr) = do
+  maybeTCType <- askForType ident
+  case maybeTCType of
+    Nothing -> throwError ("Error: Call of undeclared function in " ++ show pos)
+    Just tcType ->
+      case tcType of
+        (TCFun funType argsType) -> do
+          _ <- validateArgs argsType argsExpr
+          retType <- mapType funType
+          return retType
+        _ -> throwError ("Error: Object is not callable in " ++ show pos)
 
 evalExpr (EString _ val) = return TCString
 evalExpr (Neg pos expr) = do
@@ -76,7 +90,38 @@ evalExpr (EAdd _ e1 (Minus pos) e2) = do
     (TCBool, TCBool) -> throwError ("Error: Operator - is not defined for Bools in " ++ show pos)
     (_, _) -> throwError ("Error: Different types for operator - in " ++ show pos)
 
-evalExpr (ERel _ e1 op e2) = undefined
+evalExpr (ERel pos e1 op e2) = do
+  e1Type <- evalExpr e1
+  e2Type <- evalExpr e2
+  case op of
+    LTH _ ->
+      case (e1Type, e2Type) of
+        (TCInt, TCInt) -> return TCBool
+        (_, _) -> throwError ("Error: Undefined relation for types in " ++ show pos)
+    LE _ ->
+      case (e1Type, e2Type) of
+        (TCInt, TCInt) -> return TCBool
+        (_, _) -> throwError ("Error: Undefined relation for types in " ++ show pos)
+    GTH _ ->
+      case (e1Type, e2Type) of
+        (TCInt, TCInt) -> return TCBool
+        (_, _) -> throwError ("Error: Undefined relation for types in " ++ show pos)
+    GE _ ->
+      case (e1Type, e2Type) of
+        (TCInt, TCInt) -> return TCBool
+        (_, _) -> throwError ("Error: Undefined relation for types in " ++ show pos)
+    EQU _ ->
+      case (e1Type, e2Type) of
+        (TCInt, TCInt) -> return TCBool
+        (TCString, TCString) -> return TCBool
+        (TCBool, TCBool) -> return TCBool
+        (_, _) -> throwError ("Error: Undefined relation for types in " ++ show pos)
+    NE _ ->
+      case (e1Type, e2Type) of
+        (TCInt, TCInt) -> return TCBool
+        (TCString, TCString) -> return TCBool
+        (TCBool, TCBool) -> return TCBool
+        (_, _) -> throwError ("Error: Undefined relation for types in " ++ show pos)
 
 evalExpr (EAnd pos e1 e2) = do
   e1Type <- evalExpr e1
@@ -95,6 +140,25 @@ evalExpr (EOr pos e1 e2) = do
     (TCInt, TCInt) -> throwError ("Error: Operator 'or' is not defined for Ints in " ++ show pos)
     (TCString, TCString) -> throwError ("Error: Operator 'or' is not defined for Strings in " ++ show pos)
     (_, _) -> throwError ("Error: Different types for operator 'or' in " ++ show pos)
+
+validateArgs :: [Arg] -> [Expr] -> TypeCheckerMonad Bool
+validateArgs [] [] = return True
+validateArgs (t:ts) (e:es) = do
+  valueType <- evalExpr e
+  case t of
+    (VArg pos t ident) -> do
+      argType <- mapType t
+      if sameType argType valueType then
+        validateArgs ts es
+      else
+        throwError ("Error: Type mismatch in function call in " ++ show pos)
+    (RArg pos t ident) -> do
+      argType <- mapType t
+      if sameType argType valueType then
+        validateArgs ts es
+      else
+        throwError ("Error: Type mismatch in function call in " ++ show pos)
+
 
 evalBlock :: Block -> TCType -> Bool -> TypeCheckerMonad (Maybe StmtEnding)
 evalBlock (Block _ []) _ _ =
@@ -124,24 +188,49 @@ evalStmt :: Stmt -> TCType -> Bool -> TypeCheckerMonad (Maybe StmtEnding)
 evalStmt (Empty _) _ _ = return Nothing
 evalStmt (BStmt _ block) retType isWhile = do -- TODO CHeck this
   ending <- evalBlock block retType isWhile
-  return ending
+  return Nothing
 
 evalStmt (VarDecl _ t items) retType isWhile = do
   env <- putVarDecl t items
   return $ Just $ TCEnv env
 
-evalStmt (Ass _ ident expr) retType isWhile = undefined
+evalStmt (Ass pos ident expr) _ _ = do
+  env <- ask
+  valType <- evalExpr expr
+  maybeOriginalType <- askForType ident
+  case maybeOriginalType of
+    Nothing -> throwError ("Error: Assigment before definition in " ++ show pos)
+    Just originalType ->
+      if not (sameType valType originalType) then
+        throwError ("Error: Assigment to a variable with different type in " ++ show pos)
+      else
+        return $ Just $ TCEnv env
 
 evalStmt (Incr _ ident) retType isWhile = undefined
 evalStmt (Decr _ ident) retType isWhile = undefined
 
-evalStmt (Ret _) retType isWhile = undefined
+evalStmt (Ret _) _ _ = return $ Just Return
 
-evalStmt (VRet _ expr) retType isWhile = undefined
+evalStmt (VRet _ expr) _ _ = do
+  valueType <- evalExpr expr
+  return $ Just $ ReturnWithValue valueType
 
-evalStmt (Cond _ expr stmt) retType isWhile = undefined
+evalStmt (Cond pos expr stmt) retType isWhile = do
+  condType <- evalExpr expr
+  case condType of
+    TCBool -> do
+      ending <- evalStmt stmt retType isWhile
+      return Nothing
+    _ -> throwError ("Error: Expression in condition must be a Bool type in " ++ show pos)
 
-evalStmt (CondElse _ expr stmt1 stmt2) retType isWhile = undefined
+evalStmt (CondElse pos expr stmt1 stmt2) retType isWhile = do
+  condType <- evalExpr expr
+  case condType of
+    TCBool -> do
+      endingTrue <- evalStmt stmt1 retType isWhile
+      endingFalse <- evalStmt stmt2 retType isWhile
+      return Nothing
+    _ -> throwError ("Error: Expression in condition must be a Bool type in " ++ show pos)
 
 evalStmt (While pos expr block) retType _  = do
   eType <- evalExpr expr
@@ -151,13 +240,18 @@ evalStmt (While pos expr block) retType _  = do
       return Nothing
     _ -> throwError ("Error: Condition in while is not Bool in " ++ show pos)
 
-evalStmt (SExp _ expr) retType isWhile = undefined
+evalStmt (SExp _ expr) retType isWhile = return Nothing
 
 evalStmt (Break _) _ _ = return $ Just LoopBreak
 
 evalStmt (Continue _) _ _ = return $ Just LoopContinue
 
-evalStmt (FnDef _ funType ident args block) retType isWhile = undefined
+evalStmt (FnDef _ funType ident args block) _ _ = do
+  env <- assignType ident (TCFun funType args)
+  envWithArgs <- local (const env) (insertArgs args)
+  tcType <- mapType funType
+  _ <- local (const envWithArgs) (evalBlock block tcType False)
+  return $ Just $ TCEnv env
 
 evalStmt (Print pos expr) _ _ = do
   eType <- evalExpr expr
@@ -165,6 +259,19 @@ evalStmt (Print pos expr) _ _ = do
     TCInt -> return Nothing
     TCString -> return Nothing
     _ -> throwError ("Error: Unsupported type for print in " ++ show pos)
+
+insertArgs :: [Arg] -> TypeCheckerMonad Env
+insertArgs [] = ask
+insertArgs ((VArg _ t ident):tail) = do
+  env <- ask
+  tcType <- mapType t
+  envWithVariable <- local (const env) $ assignType ident tcType
+  local (const envWithVariable) $ insertArgs tail
+insertArgs ((RArg _ t ident):tail) = do
+  env <- ask
+  tcType <- mapType t
+  envWithVariable <- local (const env) $ assignType ident tcType
+  local (const envWithVariable) $ insertArgs tail
 
 -- Int a | Str a | Bool a | Void a | Fun a (Type' a) [Type' a]
 mapType :: Type -> TypeCheckerMonad TCType

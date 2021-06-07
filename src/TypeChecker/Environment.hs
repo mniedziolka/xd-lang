@@ -12,3 +12,8 @@ assignType :: Ident -> TCType -> TypeCheckerMonad Env
 assignType ident valueType = do
   env <- ask
   return $ Map.insert ident valueType env
+
+askForType :: Ident -> TypeCheckerMonad (Maybe TCType)
+askForType ident = do
+  env <- ask
+  return $ Map.lookup ident env
