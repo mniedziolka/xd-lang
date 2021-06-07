@@ -3,23 +3,26 @@ module Interpreter.Evaluation where
 import Control.Monad.Except
 import Control.Monad.Reader
 
+import qualified Data.Map.Lazy as Map
+
 import Interpreter.Store
 import Interpreter.Types
 import Parser.Abs
 
-calculateArgsValues :: [Expr] -> InterpreterMonad [Value]
-calculateArgsValues =
-  mapM evalExpr
-
-getLoc :: [Expr] -> InterpreterMonad [Maybe Loc]
-getLoc [] = return []
-getLoc ((EVar _ ident):tail) = do
+assignFunctionArgs :: [Arg] -> [Expr] -> InterpreterMonad Env
+assignFunctionArgs [] [] = do
+  env <- ask
+  return env
+assignFunctionArgs ((VArg _ t ident):args) (e:es) = do
+  env <- alloc t ident
+  value <- evalExpr e
+  local (const env) $ assignValue ident value
+  local (const env) $ assignFunctionArgs args es
+assignFunctionArgs ((RArg _ t ident):args) (e:es) = do
+  env <- alloc t ident
   loc <- getIdentLoc ident
-  tailList <- getLoc tail
-  return $ (Just loc):tailList
-getLoc (_:tail) = do
-  tailList <- getLoc tail
-  return $ Nothing:tailList
+  local (const $ Map.insert ident loc env) $ assignFunctionArgs args es
+assignFunctionArgs _ _ = throwError "TYPECHECKER TODO"
 
 
 evalExpr :: Expr -> InterpreterMonad Value
@@ -30,9 +33,7 @@ evalExpr (ELitFalse _) = return $ VBool False
 
 evalExpr (EApp _ ident argsExpr) = do
   VFun env funType args block <- getIdentValue ident
-  argsValues <- calculateArgsValues argsExpr
-  maybeLoc <- getLoc argsExpr
-  envWithArgs <- local (const env) (assignFunctionArgs args argsValues maybeLoc)
+  envWithArgs <- local (const env) (assignFunctionArgs args argsExpr)
   retValue <- local (const envWithArgs) (evalBlock block)
   case retValue of
     Just (ReturnWithValue value) -> return value
@@ -53,22 +54,25 @@ evalExpr (EMul _ e1 (Times _) e2) = do
   VInt int2 <- evalExpr e2
   return $ VInt (int1 * int2)
 
-evalExpr (EMul _ e1 (Div _) e2) = do
+evalExpr (EMul _ e1 (Div pos) e2) = do
   VInt int1 <- evalExpr e1
   VInt int2 <- evalExpr e2
-  if int2 == 0 then throwError "Error: Division by zero."
+  if int2 == 0 then throwError $ "Error: Division by zero" ++ show(pos)
   else return $ VInt (int1 `div` int2)
 
-evalExpr (EMul _ e1 (Mod _) e2) = do
+evalExpr (EMul _ e1 (Mod pos) e2) = do
   VInt int1 <- evalExpr e1
   VInt int2 <- evalExpr e2
-  if int2 == 0 then throwError "Error: Modulo by zero."
+  if int2 == 0 then throwError $ "Error: Modulo by zero." ++ show(pos)
   else return $ VInt (int1 `mod` int2)
 
 evalExpr (EAdd _ e1 (Plus _) e2) = do
-  VInt int1 <- evalExpr e1
-  VInt int2 <- evalExpr e2
-  return $ VInt (int1 + int2)
+  v1 <- evalExpr e1
+  v2 <- evalExpr e2
+  case (v1, v2) of
+    (VInt int1, VInt int2) -> return $ VInt (int1 + int2)
+    (VString s1, VString s2) -> return $ VString (s1 ++ s2)
+    (_, _) -> throwError "Error: Unknown error."
 
 evalExpr (EAdd _ e1 (Minus _) e2) = do
   VInt int1 <- evalExpr e1
@@ -118,7 +122,7 @@ evalBlock (Block _ (head:tail)) = do
     Just (VEnv env) -> local (const env) (evalBlock (Block Nothing tail))
 
 evalStmt :: Stmt -> InterpreterMonad (Maybe StmtEnding)
-evalStmt (Empty _) = undefined
+evalStmt (Empty _) = return Nothing
 evalStmt (BStmt _ block) = do
   ending <- evalBlock block
   return ending

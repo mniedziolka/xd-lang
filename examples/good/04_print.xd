@@ -8,6 +8,10 @@ void fun () {
 
     double_inside();
 
+    print("Numbers are working!");
+    print(1);
+    print(2);
+
     yeet;
 }
 
@@ -15,7 +19,7 @@ int main() {
     string a = "a", b = "b", c = "c";
     print(a);
     print(b);
-    print("abc");
+    print("abc" + "def");
     fun();
     yeet 0;
 }

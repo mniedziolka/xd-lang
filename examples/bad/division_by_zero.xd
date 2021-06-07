@@ -1,0 +1,3 @@
+int main() {
+    yeet 5 / 0;
+}

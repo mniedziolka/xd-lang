@@ -13,6 +13,13 @@ bool funBool() {
     yeet true;
 }
 
+int fact(int x) {
+    if (x <= 1) {
+        yeet 1;
+    }
+    yeet x * fact(x - 1);
+}
+
 int main() {
     int a = funInt();
     string b = funString();
@@ -21,7 +28,12 @@ int main() {
     bool aa = a == 0, bb = b == "abc";
 
     if (aa and bb and c) {
-        yeet 0;
+        int f = fact(5);
+        if (f == 120) {
+            yeet 0;
+        } else {
+            yeet 1;
+        }
     } else {
         yeet 1;
     }

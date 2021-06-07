@@ -1,8 +1,14 @@
 void fun(int& x, int y) {
-    x = x + 5;
+    x = x + 1;
     y = y + 5;
     yeet;
 }
+
+void fun2(int& not_init) {
+    not_init = 123;
+    yeet;
+}
+
 
 int main() {
     int x = 0, y = 0;
@@ -14,6 +20,13 @@ int main() {
 
     if (y != 0) {
         print("y is not passed by value");
+        yeet 1;
+    }
+
+    int not_init;
+    fun2(not_init);
+    if (not_init != 123) {
+        print("not_init is broken");
         yeet 1;
     }
 
