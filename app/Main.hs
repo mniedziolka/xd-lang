@@ -39,8 +39,6 @@ run v p s =
   case p ts of
     Left err -> do
       putStrLn "\nParse              Failed...\n"
-      putStrV v "Tokens:"
-      putStrV v $ show ts
       putStrLn err
       exitFailure
     Right tree -> do

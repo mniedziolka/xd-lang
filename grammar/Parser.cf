@@ -24,10 +24,6 @@ separator nonempty Item "," ;
 
 Ass.              Stmt ::= Ident "=" Expr  ";" ;
 
-Incr.             Stmt ::= Ident "++"  ";" ;
-
-Decr.             Stmt ::= Ident "--"  ";" ;
-
 VRet.             Stmt ::= "yeet" Expr ";" ;
 
 Ret.              Stmt ::= "yeet" ";" ;

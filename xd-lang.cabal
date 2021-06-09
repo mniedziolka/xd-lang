@@ -35,7 +35,10 @@ library
       Parser.Par
       Parser.Print
       Parser.Skel
+      TypeChecker.Environment
+      TypeChecker.Evaluation
       TypeChecker.TypeCheck
+      TypeChecker.Types
   other-modules:
       Paths_xd_lang
   hs-source-dirs:

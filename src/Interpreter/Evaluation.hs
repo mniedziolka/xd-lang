@@ -136,9 +136,6 @@ evalStmt (Ass _ ident expr) = do
   assignValue ident val
   return $ Just $ VEnv env
 
-evalStmt (Incr _ ident) = undefined
-evalStmt (Decr _ ident) = undefined
-
 evalStmt (Ret _) = do
   return $ Just Return
 

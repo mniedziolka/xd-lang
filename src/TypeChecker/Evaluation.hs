@@ -207,9 +207,6 @@ evalStmt (Ass (Just pos) ident expr) _ _ = do
       else
         return $ Just $ TCEnv env
 
-evalStmt (Incr _ ident) retType isWhile = undefined
-evalStmt (Decr _ ident) retType isWhile = undefined
-
 evalStmt (Ret _) _ _ = return $ Just Return
 
 evalStmt (VRet _ expr) _ _ = do

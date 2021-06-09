@@ -33,8 +33,6 @@ data Stmt' a
     | BStmt a (Block' a)
     | VarDecl a (Type' a) [Item' a]
     | Ass a Ident (Expr' a)
-    | Incr a Ident
-    | Decr a Ident
     | VRet a (Expr' a)
     | Ret a
     | Cond a (Expr' a) (Stmt' a)
@@ -121,8 +119,6 @@ instance HasPosition Stmt where
     BStmt p _ -> p
     VarDecl p _ _ -> p
     Ass p _ _ -> p
-    Incr p _ -> p
-    Decr p _ -> p
     VRet p _ -> p
     Ret p -> p
     Cond p _ _ -> p

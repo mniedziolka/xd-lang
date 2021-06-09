@@ -127,8 +127,6 @@ instance Print (Parser.Abs.Stmt' a) where
     Parser.Abs.BStmt _ block -> prPrec i 0 (concatD [prt 0 block])
     Parser.Abs.VarDecl _ type_ items -> prPrec i 0 (concatD [prt 0 type_, prt 0 items, doc (showString ";")])
     Parser.Abs.Ass _ id_ expr -> prPrec i 0 (concatD [prt 0 id_, doc (showString "="), prt 0 expr, doc (showString ";")])
-    Parser.Abs.Incr _ id_ -> prPrec i 0 (concatD [prt 0 id_, doc (showString "++"), doc (showString ";")])
-    Parser.Abs.Decr _ id_ -> prPrec i 0 (concatD [prt 0 id_, doc (showString "--"), doc (showString ";")])
     Parser.Abs.VRet _ expr -> prPrec i 0 (concatD [doc (showString "yeet"), prt 0 expr, doc (showString ";")])
     Parser.Abs.Ret _ -> prPrec i 0 (concatD [doc (showString "yeet"), doc (showString ";")])
     Parser.Abs.Cond _ expr stmt -> prPrec i 0 (concatD [doc (showString "if"), doc (showString "("), prt 0 expr, doc (showString ")"), prt 0 stmt])

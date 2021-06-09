@@ -31,8 +31,6 @@ transStmt x = case x of
   Parser.Abs.BStmt _ block -> failure x
   Parser.Abs.VarDecl _ type_ items -> failure x
   Parser.Abs.Ass _ ident expr -> failure x
-  Parser.Abs.Incr _ ident -> failure x
-  Parser.Abs.Decr _ ident -> failure x
   Parser.Abs.VRet _ expr -> failure x
   Parser.Abs.Ret _ -> failure x
   Parser.Abs.Cond _ expr stmt -> failure x
