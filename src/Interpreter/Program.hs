@@ -22,9 +22,9 @@ topDefinitions (head:tail) = do
 
 
 interpret :: Program -> InterpreterMonad Integer
-interpret (Program position topDefs) = do
+interpret (Program pos topDefs) = do
   env <- topDefinitions topDefs
-  VInt exitCode <- local (const env) $ evalExpr $ EApp Nothing (Ident "main") []
+  VInt exitCode <- local (const env) $ evalExpr $ EApp pos (Ident "main") []
   return exitCode
 
 

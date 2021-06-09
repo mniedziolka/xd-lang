@@ -22,6 +22,7 @@ topDefinitions (head:tail) = do
 typeCheck :: Program -> TypeCheckerMonad ()
 typeCheck (Program pos topDefs) = do
   env <- topDefinitions topDefs
+  -- throwError ("BAD error catch " ++ show topDefs)
   return ()
 
 runTypeCheck :: Program -> IO (Either String ())

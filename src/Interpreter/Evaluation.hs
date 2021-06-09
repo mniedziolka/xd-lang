@@ -9,20 +9,19 @@ import Interpreter.Store
 import Interpreter.Types
 import Parser.Abs
 
-assignFunctionArgs :: [Arg] -> [Expr] -> InterpreterMonad Env
-assignFunctionArgs [] [] = do
-  env <- ask
-  return env
-assignFunctionArgs ((VArg _ t ident):args) (e:es) = do
-  env <- alloc t ident
+assignFunctionArgs :: [Arg] -> [Expr] -> Env -> InterpreterMonad Env
+assignFunctionArgs [] [] funEnv = do
+  return funEnv
+assignFunctionArgs ((VArg _ t ident):args) (e:es) funEnv = do
+  newFunEnv <- local (const funEnv) $ alloc t ident
   value <- evalExpr e
-  local (const env) $ assignValue ident value
-  local (const env) $ assignFunctionArgs args es
-assignFunctionArgs ((RArg _ t ident):args) (e:es) = do
-  env <- alloc t ident
-  loc <- getIdentLoc ident
-  local (const $ Map.insert ident loc env) $ assignFunctionArgs args es
-assignFunctionArgs _ _ = throwError "TYPECHECKER TODO"
+  local (const newFunEnv) $ assignValue ident value
+  assignFunctionArgs args es newFunEnv
+assignFunctionArgs ((RArg _ t ident):args) ((EVar _ varIdent):es) funEnv = do
+  newFunEnv <- local (const funEnv) $ alloc t ident
+  loc <- getIdentLoc varIdent
+  assignFunctionArgs args es (Map.insert ident loc newFunEnv)
+assignFunctionArgs _ _ _ = throwError "Error: Unknown error"
 
 
 evalExpr :: Expr -> InterpreterMonad Value
@@ -31,14 +30,14 @@ evalExpr (ELitInt _ val) = return $ VInt val
 evalExpr (ELitTrue _) = return $ VBool True
 evalExpr (ELitFalse _) = return $ VBool False
 
-evalExpr (EApp _ ident argsExpr) = do
+evalExpr (EApp (Just pos) ident argsExpr) = do
   VFun env funType args block <- getIdentValue ident
-  envWithArgs <- local (const env) (assignFunctionArgs args argsExpr)
+  envWithArgs <- assignFunctionArgs args argsExpr env
   retValue <- local (const envWithArgs) (evalBlock block)
   case retValue of
     Just (ReturnWithValue value) -> return value
     Just (Return) -> return VNull
-    _ -> throwError "Function without yeeeeet"
+    _ -> throwError ("Error: Function without yeet in " ++ show pos)
 
 evalExpr (EString _ val) = return $ VString val
 evalExpr (Neg _ expr) = do
@@ -54,16 +53,16 @@ evalExpr (EMul _ e1 (Times _) e2) = do
   VInt int2 <- evalExpr e2
   return $ VInt (int1 * int2)
 
-evalExpr (EMul _ e1 (Div pos) e2) = do
+evalExpr (EMul _ e1 (Div (Just pos)) e2) = do
   VInt int1 <- evalExpr e1
   VInt int2 <- evalExpr e2
-  if int2 == 0 then throwError $ "Error: Division by zero" ++ show(pos)
+  if int2 == 0 then throwError $ "Error: Division by zero in " ++ show(pos)
   else return $ VInt (int1 `div` int2)
 
-evalExpr (EMul _ e1 (Mod pos) e2) = do
+evalExpr (EMul _ e1 (Mod (Just pos)) e2) = do
   VInt int1 <- evalExpr e1
   VInt int2 <- evalExpr e2
-  if int2 == 0 then throwError $ "Error: Modulo by zero." ++ show(pos)
+  if int2 == 0 then throwError $ "Error: Modulo by zero in " ++ show(pos)
   else return $ VInt (int1 `mod` int2)
 
 evalExpr (EAdd _ e1 (Plus _) e2) = do
