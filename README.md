@@ -26,13 +26,12 @@ Na 15 punktów:
 
 Na 20 punktów:
 * [x] 09 (przesłanianie i statyczne wiązanie)
-* [ ] 10 (obsługa błędów wykonania)
+* [x] 10 (obsługa błędów wykonania)
 * [x] 11 (funkcje zwracające wartość)
 
 Na 30 punktów
-* [ ] 12 (4) (statyczne typowanie)
-* [ ] 14 (1) (rekordy/tablice/listy)
-* [ ] 15 (2) (krotki z przypisaniem)
+* [x] 12 (4) (statyczne typowanie)
+* [x] 13 (2) (funkcje zagnieżdżone ze statycznym wiązaniem)
 * [x] 16 (1) (break, continue)
 
 ### Źródła
@@ -43,3 +42,22 @@ zostało zaczerpniętych z następujących projektów:
 * https://github.com/upicine/Capp-interpreter
 * https://github.com/kkragoth-mimuw/lakke
 
+### Język
+Język składa się z listy definicji.
+Uruchomienie zaczyna się do funkcji `main` która musi być typu int i nie posiadać parametrów.
+Przed interpreterem uruchamiany jest `TypeChecker`.
+Istnieją zmienne globalne, funkcje można dowolnie zagnieżdżać ze statycznym wiązaniem.
+Możliwe niepoprawne użycie `break`, `continue` lub potencjalne wyjście z funkcji
+złym typem sprawdzane jest na etapie `TypeCheckera`.
+Dopuszczalne jest redaklarowanie zmiennej.
+
+### Zmiany od rozmowy
+* dodano typechecker
+* dodano sensowną obsługę błędow
+* rozwiązano konflikty w gramatyce
+* usunięto krotki i tablice
+* dodano przykłady bad (żeby je przetestować należy odkomentować poszczególne linijki)
+* zmieniono `StmtEnding` aby uwzględniał możliwość zwrócenia nowego `Env`
+* naprawiono problem z niezdefiniowanym przekazaniem przez referencje
+* dodano operacje `+` dla stringów i printowanie intów
+* naprawiono problem ze zmienną typu void

@@ -191,9 +191,13 @@ evalStmt (BStmt _ block) retType isWhile = do -- TODO CHeck this
   ending <- evalBlock block retType isWhile
   return Nothing
 
-evalStmt (VarDecl _ t items) retType isWhile = do
-  env <- putVarDecl t items
-  return $ Just $ TCEnv env
+evalStmt (VarDecl (Just pos) t items) retType isWhile = do
+  case t of
+    Void _ -> throwError ("Error: variable can't be void type in " ++ show pos)
+    _ -> do
+      env <- putVarDecl t items
+      return $ Just $ TCEnv env
+
 
 evalStmt (Ass (Just pos) ident expr) _ _ = do
   env <- ask
