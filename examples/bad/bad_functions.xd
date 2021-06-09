@@ -1,0 +1,32 @@
+int main() {
+    int fun(int a, string b) {
+        yeet a;
+    }
+
+    int without_brackets() {
+        yeet 0;
+    }
+
+    XD without_brackets;                 XD Using function as variable.
+    XD not_declared();                   XD Call of undeclared function.
+    XD yeet fun(5 + 5, 100 - 5);         XD Param type miss match.
+
+    XD int yeet_of_wrong_type() {
+    XD    yeet "string";
+    XD }
+
+    XD int yeet_of_wrong_type() {
+    XD     yeet;
+    XD }
+
+    XD void yeet_of_wrong_type() {
+    XD     yeet 3;
+    XD }
+
+    {
+        void different_scope() { yeet; }
+    }
+
+    XD different_scope();
+
+}

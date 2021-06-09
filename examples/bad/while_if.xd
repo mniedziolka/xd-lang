@@ -1,0 +1,10 @@
+int main() {
+    XD break;
+    XD continue;
+    XD if (1) {} {}
+    XD if (true) { yeet 0; } { yeet "a"; }
+    XD while ("a") { yeet 0; }
+    XD while (false) { "a" + 5; }
+
+    yeet 0;
+}

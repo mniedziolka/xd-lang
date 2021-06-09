@@ -1,0 +1,19 @@
+int fun() {
+    yeet 5 + 5;
+}
+
+int main() {
+    string a = "a", b = "b";
+    int n = 100;
+    XD bool t = !100;
+    XD int t = - a;
+    XD bool t = a < b;
+
+    int nn = 2 * n + n;
+    string s = "ab" + "bc";
+
+    XD string s = "ab" * "bc";
+    XD bool s = true / false;
+
+    yeet 0;
+}
