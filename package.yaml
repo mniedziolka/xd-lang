@@ -1,7 +1,7 @@
 name:                xd-lang
-version:             0.1.0.0
-github:              "niedziol/xd-lang"
-license:             BSD3
+version:             1.0.0.0
+github:              "mniedziolka/xd-lang"
+license:             MIT
 author:              "Michał Niedziółka"
 maintainer:          "example@example.com"
 copyright:           "2021 Michał Niedziółka"
@@ -17,7 +17,7 @@ extra-source-files:
 # To avoid duplicated efforts in documentation and dealing with the
 # complications of embedding Haddock markup inside cabal files, it is
 # common to point users to the README.md file.
-description:         Please see the README on GitHub at <https://github.com/githubuser/XD#readme>
+description:         Please see the README on GitHub at <https://github.com/mniedziolka/xd-lang#readme>
 
 dependencies:
 - base >= 4.7 && < 5

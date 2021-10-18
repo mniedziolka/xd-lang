@@ -1,12 +1,15 @@
-# XD
+# xd-lang
+
+In this repository you can find an interpreter for a simple imperative language called "xd".
+It was made for the "Programming languages and paradigms" course, which is an obligatory course at my university.
+Because of that you can find here many inconsistencies or even errors.
+
+## Licence
+This project is released on the MIT license.
+Feel free to use it in any way you like.
+The whole license file can be found [here](./LICENSE).
 
 ## Running
-
-### Students machine
-```
-make
-./interpreter prog.xd
-```
 
 ### Machine with stack
 ```
@@ -14,50 +17,36 @@ stack build
 stack run xd-lang prog.xd
 ```
 
-### Features
-Na 15 punktów:
-* [x] 01 (trzy typy)
-* [x] 02 (literały, arytmetyka, porównania)
-* [x] 03 (zmienne, przypisanie)
+## Implemented features
+First:
+* [x] 01 (3 types: bool, int, string)
+* [x] 02 (literals, arithmetic, comparisons)
+* [x] 03 (variables, assignments)
 * [x] 04 (print)
 * [x] 05 (while, if)
-* [x] 06 (funkcje lub procedury, rekurencja)
-* [x] 07 (przez zmienną / przez wartość / in/out)
+* [x] 06 (functions, recurrence)
+* [x] 07 (passing the variable by reference or value)
 
-Na 20 punktów:
-* [x] 09 (przesłanianie i statyczne wiązanie)
-* [x] 10 (obsługa błędów wykonania)
-* [x] 11 (funkcje zwracające wartość)
+Second
+* [x] 09 (shadowing and static binding)
+* [x] 10 (runtime error handling)
+* [x] 11 (functions that can return a value)
 
-Na 30 punktów
-* [x] 12 (4) (statyczne typowanie)
-* [x] 13 (2) (funkcje zagnieżdżone ze statycznym wiązaniem)
+Third:
+* [x] 12 (4) (statically typed language)
+* [x] 13 (2) (nested functions with static binding)
 * [x] 16 (1) (break, continue)
 
-### Źródła
-Kilka ogólnych rozwiązań jak np. struktura projektu czy zarządzanie stanem
-zostało zaczerpniętych z następujących projektów:
+## Examples
+You can find some examples written in this language in the [examples/good](./examples/good) directory.
+Their numbers are related to the list of implemented features.
+There are also sam bad examples available in [examples/bad](./examples/bad) directory.
+They're mostly checking the "Typechecker" functionalities.
+
+## Inspirations
+Some general concepts like code structure or managing the state of the program are taken from other projects.
+Check them out, they might be useful:
 * https://github.com/mbenke/toy-interpreters
 * https://github.com/BAndysc/BInterpreter
 * https://github.com/upicine/Capp-interpreter
 * https://github.com/kkragoth-mimuw/lakke
-
-### Język
-Język składa się z listy definicji.
-Uruchomienie zaczyna się do funkcji `main` która musi być typu int i nie posiadać parametrów.
-Przed interpreterem uruchamiany jest `TypeChecker`.
-Istnieją zmienne globalne, funkcje można dowolnie zagnieżdżać ze statycznym wiązaniem.
-Możliwe niepoprawne użycie `break`, `continue` lub potencjalne wyjście z funkcji
-złym typem sprawdzane jest na etapie `TypeCheckera`.
-Dopuszczalne jest redaklarowanie zmiennej.
-
-### Zmiany od rozmowy
-* dodano typechecker
-* dodano sensowną obsługę błędow
-* rozwiązano konflikty w gramatyce
-* usunięto krotki i tablice
-* dodano przykłady bad (żeby je przetestować należy odkomentować poszczególne linijki)
-* zmieniono `StmtEnding` aby uwzględniał możliwość zwrócenia nowego `Env`
-* naprawiono problem z niezdefiniowanym przekazaniem przez referencje
-* dodano operacje `+` dla stringów i printowanie intów
-* naprawiono problem ze zmienną typu void
